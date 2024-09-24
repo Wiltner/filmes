@@ -1,23 +1,48 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
 function App() {
+  const [filme, setFilme] = useState('');
+  const [filmes, setFilmes] = useState([]);
+
+  const buscarFilme = async () => {
+    const apiKey = '33279cc1';
+    const url = `https://www.omdbapi.com/?apikey=${apiKey}&s=${filme}`;
+
+    try {
+      const response = await fetch(url);
+      const json = await response.json();
+      if (json.Search) {
+        setFilmes(json.Search);
+      } else {
+        setFilmes([]);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dados da API:', error);
+      setFilmes([]);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1 className='Title'>Busca de Filmes</h1>
+      <div>
+        <input
+          type='text'
+          value={filme}
+          onChange={(e) => setFilme(e.target.value)}
+          placeholder='Digite o nome do filme'
+        />
+        <button onClick={buscarFilme}>Buscar</button>
+      </div>
+      <div className='filmes-container'>
+        {filmes.map((filme) => (
+          <div key={filme.imdbID} className='filme'>
+            <h2>{filme.Title}</h2>
+            <img src={filme.Poster} alt={filme.Title} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
